@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/user/login", authLimiter, userController.login )
 router.post("/user/logout", authLimiter, userController.logout )
-router.get("/user/refresh", userController.refreshToken)
+router.post("/user/refresh", userController.refreshToken)
 
 
 router.post(

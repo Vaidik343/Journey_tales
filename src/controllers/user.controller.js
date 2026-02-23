@@ -137,20 +137,15 @@ const login = async (req, res, next) => {
 
     await user.update({ refreshToken });
 
-    res
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .json({
-        accessToken,
-        user: {
-          id: user.id, // Sequelize uses `id`, not `_id`
-          email: user.email,
-        },
-      });
+    // Return both tokens in response body for React Native
+    res.json({
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -160,7 +155,9 @@ const login = async (req, res, next) => {
  * LOGOUT
  */
 const logout = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  // Accept refreshToken from body for React Native
+  const token = req.body.refreshToken;
+
   if (!token) {
     return res.status(400).json({ message: "No refresh token found" });
   }
@@ -173,11 +170,9 @@ const logout = async (req, res) => {
       await user.update({ refreshToken: null });
     }
 
-    res.clearCookie("refreshToken").json({
-      message: "Logged out successfully",
-    });
+    res.json({ message: "Logged out successfully" });
   } catch (error) {
-    res.clearCookie("refreshToken").json({ message: "Logged out" });
+    res.json({ message: "Logged out" });
   }
 };
 
@@ -185,7 +180,8 @@ const logout = async (req, res) => {
  * REFRESH TOKEN
  */
 const refreshToken = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  // Accept refreshToken from body for React Native
+  const token = req.body.refreshToken;
 
   if (!token) {
     return res.status(401).json({ message: "No refresh token" });
