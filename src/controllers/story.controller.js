@@ -62,12 +62,16 @@ const createStories = async (req, res, next) => {
  */
 const getAllStories = async (req, res, next) => {
   try {
+    // Make sure user exists
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
     const stories = await Story.findAll({
       include: [
         {
           model: Trip,
-          where: { tripId: req.body },
-          attributes: [],
+          where: { userId }, // ✅ only trips belonging to logged-in user
+          attributes: [],   // exclude Trip fields
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -82,18 +86,22 @@ const getAllStories = async (req, res, next) => {
     next(error);
   }
 };
+console.log("🚀 ~ getAllStories ~ getAllStories:", getAllStories)
 
 /**
  * GET STORY BY ID
  */
 const getStoryById = async (req, res, next) => {
   try {
+     const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
     const story = await Story.findOne({
       where: { id: req.params.id },
       include: [
         {
           model: Trip,
-         where: { tripId: req.body },
+         where: { userId },
           attributes: [],
         },
       ],
@@ -121,7 +129,7 @@ const updateStories = async (req, res, next) => {
       include: [
         {
           model: Trip,
-     where: { tripId: req.body },
+     where: { userId},
           attributes: [],
         },
       ],

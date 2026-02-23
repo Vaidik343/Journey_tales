@@ -49,10 +49,14 @@ const createTrip = async (req, res, next) => {
  */
 const getAllTrip = async (req, res, next) => {
   try {
+
+    const userId = req.user?.id;
+if (!userId) return res.status(401).json({ message: "Unauthorized" });
     const trips = await Trip.findAll({
       where: { userId: req.user.id },
       order: [["createdAt", "DESC"]],
     });
+    console.log("🚀 ~ getAllTrip ~ trips:", trips)
 
     if (!trips.length) {
       return res.status(404).json({ message: "Not found" });
@@ -63,6 +67,7 @@ const getAllTrip = async (req, res, next) => {
     next(error);
   }
 };
+console.log("🚀 ~ getAllTrip ~ getAllTrip:", getAllTrip)
 
 /**
  * GET TRIP BY ID
