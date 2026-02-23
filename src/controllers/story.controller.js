@@ -1,0 +1,183 @@
+const { Story, Trip } = require("../models");
+const { fileUpload } = require("../utils/fileUpload");
+
+/**
+ * CREATE STORY
+ */
+const createStories = async (req, res, next) => {
+  const { tripId, placeName, story, visitDate } = req.body;
+
+  try {
+    // Ensure trip exists and belongs to logged-in user
+    const trip = await Trip.findOne({
+      where: {
+        id: tripId,
+       
+      },
+    });
+    console.log("🚀 ~ createStories ~ trip:", trip)
+
+    if (!trip) {
+      return res.status(400).json({ message: "Invalid Trip" });
+    }
+
+    // Check duplicate place inside same trip
+    const exists = await Story.findOne({
+      where: { tripId, placeName },
+    });
+
+    if (exists) {
+      return res
+        .status(400)
+        .json({ message: "Place already exists in this trip!" });
+    }
+
+    // Upload images
+    let imageUrls = [];
+    console.log("🚀 ~ createStories ~ imageUrls:", imageUrls)
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const url = await fileUpload(file.path);
+        console.log("🚀 ~ createStories ~ url:", url)
+        imageUrls.push(url);
+      }
+    }
+
+    const newStory = await Story.create({
+      tripId,
+      placeName,
+      images: imageUrls,
+      story,
+      visitDate,
+    });
+
+    res.status(201).json(newStory);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET ALL STORIES (OF LOGGED-IN USER)
+ */
+const getAllStories = async (req, res, next) => {
+  try {
+    const stories = await Story.findAll({
+      include: [
+        {
+          model: Trip,
+          where: { tripId: req.body },
+          attributes: [],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    if (!stories.length) {
+      return res.status(404).json({ message: "Not found!" });
+    }
+
+    res.status(200).json(stories);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET STORY BY ID
+ */
+const getStoryById = async (req, res, next) => {
+  try {
+    const story = await Story.findOne({
+      where: { id: req.params.id },
+      include: [
+        {
+          model: Trip,
+         where: { tripId: req.body },
+          attributes: [],
+        },
+      ],
+    });
+
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    res.status(200).json(story);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * UPDATE STORY
+ */
+const updateStories = async (req, res, next) => {
+  const { placeName, story, visitDate } = req.body;
+
+  try {
+    const storyRecord = await Story.findOne({
+      where: { id: req.params.id },
+      include: [
+        {
+          model: Trip,
+     where: { tripId: req.body },
+          attributes: [],
+        },
+      ],
+    });
+
+    if (!storyRecord) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    await storyRecord.update({
+      placeName,
+      story,
+      visitDate,
+    });
+
+    res.status(200).json({
+      message: "Updated successfully",
+      updated: storyRecord,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * DELETE STORY
+ */
+const deleteStories = async (req, res, next) => {
+  try {
+    const story = await Story.findOne({
+      where: { id: req.params.id },
+      include: [
+        {
+          model: Trip,
+          where: { userId: req.user.id },
+          attributes: [],
+        },
+      ],
+    });
+
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    await story.destroy();
+
+    res.status(200).json({ message: "Deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.storyController = {
+  createStories,
+  getAllStories,
+  getStoryById,
+  updateStories,
+  deleteStories,
+};
