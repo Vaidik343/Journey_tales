@@ -32,6 +32,14 @@ app.get("/health", (req, res) => {
     res.send("home page");
 });
 
+
+// Ensure upload temp directory exists (important for production)
+const tempDir = path.join(__dirname, "public", "temp");
+
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+  console.log("📁 Created upload temp directory:", tempDir);
+}
 // routes
 const routesPath = path.join(__dirname, 'routes');
 fs.readdirSync(routesPath).forEach((file) => {
