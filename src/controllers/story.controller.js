@@ -54,7 +54,7 @@ const createStories = async (req, res, next) => {
     });
     console.log("🚀 ~ createStories ~ newStory:", newStory)
 
-    res.status(201).json({message: "story created",newStory});
+    res.status(201).json(newStory);
   } catch (error) {
     next(error);
   }
