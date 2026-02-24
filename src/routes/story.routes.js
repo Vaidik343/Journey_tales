@@ -8,12 +8,12 @@ const { useAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
+
 router.post(
   "/stories",
   apiLimiter,
   useAuth,
   upload.array("images", 10),
-  console.log("✅ Request reached stories route"),
   storyValidations.createStoriesValidations,
   validate,
   storyController.createStories,
