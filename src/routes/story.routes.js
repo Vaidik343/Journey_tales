@@ -13,6 +13,7 @@ router.post(
   apiLimiter,
   useAuth,
   upload.array("images", 10),
+  console.log("✅ Request reached stories route"),
   storyValidations.createStoriesValidations,
   validate,
   storyController.createStories,
