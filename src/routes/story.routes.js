@@ -12,11 +12,7 @@ const router = express.Router();
 router.post(
   "/stories",
   upload.array("images", 10),
-  (req, res) => {
-    console.log("FILES:", req.files?.length);
-    console.log("BODY:", req.body);
-    res.json({ ok: true });
-  },
+ 
   storyController.createStories,
   // apiLimiter,
   // useAuth,

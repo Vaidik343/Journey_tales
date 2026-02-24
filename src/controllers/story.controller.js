@@ -6,7 +6,7 @@ const { fileUpload } = require("../utils/fileUpload");
  */
 const createStories = async (req, res, next) => {
   const { tripId, placeName, story, visitDate } = req.body;
-  console.log("🚀 ~ createStories ~  tripId, placeName, story, visitDate :",  tripId, placeName, story, visitDate )
+  // console.log("🚀 ~ createStories ~  tripId, placeName, story, visitDate :",  req.body )
 
   const parsedVisitDate = visitDate ? new Date(visitDate) : null;
   try {
@@ -54,7 +54,7 @@ const createStories = async (req, res, next) => {
     });
     console.log("🚀 ~ createStories ~ newStory:", newStory)
 
-    res.status(201).json(newStory);
+    res.status(201).json({message: "story created",newStory});
   } catch (error) {
     next(error);
   }
