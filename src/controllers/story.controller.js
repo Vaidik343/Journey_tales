@@ -7,6 +7,7 @@ const { fileUpload } = require("../utils/fileUpload");
 const createStories = async (req, res, next) => {
   const { tripId, placeName, story, visitDate } = req.body;
 
+  const parsedVisitDate = visitDate ? new Date(visitDate) : null;
   try {
     // Ensure trip exists and belongs to logged-in user
     const trip = await Trip.findOne({
@@ -48,7 +49,7 @@ const createStories = async (req, res, next) => {
       placeName,
       images: imageUrls,
       story,
-      visitDate,
+      visitDate:parsedVisitDate,
     });
 
     res.status(201).json(newStory);
@@ -122,7 +123,7 @@ const getStoryById = async (req, res, next) => {
  */
 const updateStories = async (req, res, next) => {
   const { placeName, story, visitDate } = req.body;
-
+const userId = req.user?.id;
   try {
     const storyRecord = await Story.findOne({
       where: { id: req.params.id },
