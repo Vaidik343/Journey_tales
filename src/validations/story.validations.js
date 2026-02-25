@@ -12,7 +12,7 @@ const createStoriesValidations = [
 
 const updateStoriesValidation = [
       param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
 
         body("placeName").optional()
@@ -25,7 +25,7 @@ const updateStoriesValidation = [
 
 const deleteStoriedValidation = [
       param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
 ]
 

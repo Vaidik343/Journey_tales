@@ -1,3 +1,4 @@
+
 const { Trip } = require("../models");
 const { fileUpload } = require("../utils/fileUpload");
 
@@ -96,11 +97,11 @@ const getTripById = async (req, res, next) => {
  */
 const updateTrip = async (req, res, next) => {
   const { title, startDate, endDate, summary } = req.body;
-
+  const tripId = req.params.id
   try {
     const trip = await Trip.findOne({
       where: {
-        id: req.params.id,
+        id: tripId,
         userId: req.user.id,
       },
     });
@@ -135,25 +136,26 @@ const updateTrip = async (req, res, next) => {
  * DELETE TRIP
  */
 const deleteTrip = async (req, res, next) => {
+  const tripId = req.params.id
   try {
-    const trip = await Trip.findOne({
-      where: {
-        id: req.params.id,
-        userId: req.user.id,
-      },
-    });
-
-    if (!trip) {
-      return res.status(404).json({ message: "Not found" });
+    
+  const deleteTrip =  await Trip.destroy({
+    where: {id : tripId,
+      userId: req.user.id,
     }
+  });
 
-    await trip.destroy();
-
+    if(!deleteTrip)
+    {
+      return res.status(404).json("Not found")
+    }
     res.status(200).json({ message: "Trip deleted successfully" });
   } catch (error) {
     next(error);
   }
 };
+console.log("🚀 ~ deleteTrip ~ deleteTrip:", deleteTrip)
+
 
 module.exports.tripController = {
   createTrip,

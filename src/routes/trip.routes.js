@@ -30,8 +30,8 @@ router.delete(
   "/trip/:id",
   apiLimiter,
   useAuth,
-  tripValidations.deleteTripValidation,
-  validate,
+  // tripValidations.deleteTripValidation,
+  // validate,
   tripController.deleteTrip,
 );
 

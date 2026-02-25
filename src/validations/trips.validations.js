@@ -35,7 +35,7 @@ const createTripValidations = [
 
 const updateTripValidations = [
   param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid trip ID"),
 
   body("title")
@@ -70,9 +70,7 @@ const updateTripValidations = [
 ];
 
 const deleteTripValidation = [
-  param("id")
-    .isInt()
-    .withMessage("Invalid trip ID"),
+  param("id").isUUID().withMessage("Invalid trip ID"),
 ];
 
 module.exports.tripValidations = {

@@ -2,7 +2,7 @@ const {body, param} = require('express-validator');
 
 const createWishListValidations = [
     body('tripId').notEmpty().withMessage("Trip Id required!")
-    .isMongoId().withMessage("Invalid Id"),
+   .withMessage("Invalid Id"),
 
     body('name').notEmpty().withMessage("Name required!")
     .isLength({min:3}).withMessage("Name must be at least 3 character!")
@@ -13,7 +13,7 @@ const createWishListValidations = [
 
 const updateWishListValidations = [
      param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
 
     
@@ -27,9 +27,9 @@ const updateWishListValidations = [
 
 const deleteWishListValidations = [
       param("id")
-    .isInt()
+  .isUUID()
     .withMessage("Invalid user ID"),  param('id')
-    .isMongoId().withMessage("Invalid Id"),
+
 ]
 
 module.exports.wishlistValidations = {createWishListValidations, updateWishListValidations, deleteWishListValidations}

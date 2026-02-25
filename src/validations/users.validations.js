@@ -10,7 +10,7 @@ const createUserValidation = [
 
 const updateUserValidation = [
   param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
   body("name").optional().notEmpty(),
   body("email").optional().isEmail().withMessage("Valid email required!"),
@@ -18,7 +18,7 @@ const updateUserValidation = [
 
 const deleteUserValidation = [
   param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
 ];
 

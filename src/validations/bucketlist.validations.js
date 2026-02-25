@@ -3,7 +3,7 @@ const { body, param } = require("express-validator");
 const createBucketListValidations = [
   body("tripId")
     .notEmpty().withMessage("Trip Id required!")
-   .isInt()
+   .isUUID()
     .withMessage("Invalid user ID"),
    
 
@@ -23,7 +23,7 @@ const createBucketListValidations = [
 
 const updateBucketListValidations = [
    param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
   body("name")
     .optional()
@@ -41,7 +41,7 @@ const updateBucketListValidations = [
 
 const deleteBucketListValidations = [
    param("id")
-    .isInt()
+    .isUUID()
     .withMessage("Invalid user ID"),
 ];
 
