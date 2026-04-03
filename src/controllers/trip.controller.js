@@ -10,7 +10,7 @@ const createTrip = async (req, res, next) => {
   console.log("FILE:", req.file);
 
   const { title, startDate, endDate, summary } = req.body;
-    const userId = req.user.id; // ✅ get user from middleware
+    const userId = req.user?.id;
   console.log("🚀 ~ createTrip ~ userId:", userId)
 
   try {

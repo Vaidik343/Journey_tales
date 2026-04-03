@@ -14,7 +14,7 @@ const databaseUrl =
 const sequelize = new Sequelize(databaseUrl, {
   dialect: "postgres",
   dialectOptions:
-    env === "production"
+    env !== "test"
       ? {
           ssl: {
             require: true,
@@ -24,5 +24,4 @@ const sequelize = new Sequelize(databaseUrl, {
       : {},
   logging: false
 });
-
 module.exports = { sequelize };

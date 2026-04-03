@@ -14,6 +14,7 @@ const createStories = async (req, res, next) => {
     const trip = await Trip.findOne({
       where: {
         id: tripId,
+        //  userId: req.user.id,
        
       },
     });
