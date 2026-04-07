@@ -11,14 +11,15 @@ const router = express.Router();
 
 router.post(
   "/stories",
+  useAuth,
   upload.array("images", 10),
  
   storyController.createStories,
-  // apiLimiter,
-  // useAuth,
+  apiLimiter,
   
-  // storyValidations.createStoriesValidations,
-  // validate,
+  
+  storyValidations.createStoriesValidations,
+  validate,
 );
 router.get("/stories", useAuth, storyController.getAllStories);
 router.get("/stories/:id", useAuth, storyController.getStoryById);

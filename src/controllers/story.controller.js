@@ -1,5 +1,5 @@
 const { Story, Trip } = require("../models");
-const { fileUpload } = require("../utils/fileUpload");
+const { fileUpload, deleteFromCloudinary } = require("../utils/fileUpload");
 
 /**
  * CREATE STORY
@@ -14,7 +14,7 @@ const createStories = async (req, res, next) => {
     const trip = await Trip.findOne({
       where: {
         id: tripId,
-        //  userId: req.user.id,
+         userId: req.user.id,
        
       },
     });
@@ -37,13 +37,23 @@ const createStories = async (req, res, next) => {
 
     // Upload images
     let imageUrls = [];
-    console.log("🚀 ~ createStories ~ imageUrls:", imageUrls)
+    // console.log("🚀 ~ createStories ~ imageUrls:", imageUrls)
+    
     if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const url = await fileUpload(file.path);
-        console.log("🚀 ~ createStories ~ url:", url)
-        imageUrls.push(url);
+      try {
+        imageUrls = await Promise.all(
+          req.files.map(async (file) => {
+            const url = await fileUpload(file.path);
+            if(!url) throw new Error("Upload failed");
+            return url;
+          })
+        )
+      } catch (error) {
+        return res.status(500).json({
+          message:"Image upload failed. Story not created.",
+        });
       }
+    
     }
 
     const newStory = await Story.create({
@@ -177,7 +187,14 @@ const deleteStories = async (req, res, next) => {
     if (!story) {
       return res.status(404).json({ message: "Story not found" });
     }
+     if(story.images && story.images.length > 0)
+     {
+      await Promise.all(
+        story.images.map((img) => deleteFromCloudinary(img.public_id))
+      );
+     }
 
+     //delete from DB
     await story.destroy();
 
     res.status(200).json({ message: "Deleted successfully" });

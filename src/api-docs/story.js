@@ -6,20 +6,27 @@
  * paths:
  *   /api/stories:
  *     post:
- *       summary: Create story (requires tripId)
+ *       summary: Create story
  *       tags: [Story]
+ *       security:
+ *         - bearerAuth: []
  *       requestBody:
  *         required: true
  *         content:
  *           multipart/form-data:
  *             schema:
  *               type: object
+ *               required:
+ *                 - tripId
+ *                 - placeName
+ *                 - story
  *               properties:
  *                 images:
  *                   type: array
  *                   items:
  *                     type: string
  *                     format: binary
+ *                   maxItems: 10
  *                 tripId:
  *                   type: string
  *                   format: uuid
@@ -37,14 +44,20 @@
  *       responses:
  *         201:
  *           description: Story created
+ *         400:
+ *           description: Invalid trip or duplicate place
+ *         500:
+ *           description: Image upload failed
  *     get:
- *       summary: Get all stories
+ *       summary: Get all stories (for logged-in user)
  *       tags: [Story]
  *       security:
  *         - bearerAuth: []
  *       responses:
  *         200:
  *           description: List of stories
+ *         401:
+ *           description: Unauthorized
  *   /api/stories/{id}:
  *     get:
  *       summary: Get story by ID
@@ -61,6 +74,10 @@
  *       responses:
  *         200:
  *           description: Story details
+ *         404:
+ *           description: Story not found
+ *         401:
+ *           description: Unauthorized
  *     put:
  *       summary: Update story
  *       tags: [Story]
@@ -88,9 +105,13 @@
  *                   format: date
  *       responses:
  *         200:
- *           description: Story updated
+ *           description: Story updated successfully
+ *         404:
+ *           description: Story not found
+ *         401:
+ *           description: Unauthorized
  *     delete:
- *       summary: Delete story
+ *       summary: Delete story and associated images
  *       tags: [Story]
  *       security:
  *         - bearerAuth: []
@@ -103,5 +124,9 @@
  *             format: uuid
  *       responses:
  *         200:
- *           description: Story deleted
+ *           description: Story deleted successfully
+ *         404:
+ *           description: Story not found
+ *         401:
+ *           description: Unauthorized
  */
