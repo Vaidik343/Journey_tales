@@ -6,10 +6,12 @@ const {connectDB} = require('./config/connectDB');
 const fs = require('fs');
 const path = require('path')
 const app = express();
-const PORT = process.env.PORT || 7011;
+const PORT = process.env.PORT || 7012;
 const helmet = require('helmet')
 
 const cookieParser = require('cookie-parser');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 app.use(
   helmet({
@@ -59,6 +61,11 @@ fs.readdirSync(routesPath).forEach((file) => {
     }
 
 })
+
+// Swagger documentation
+const swaggerOptions = require('./api-docs/swaggerConfig');
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use(require("./middleware/errorHandler"));
 

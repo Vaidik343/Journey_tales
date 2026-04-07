@@ -96,7 +96,7 @@ const getTripById = async (req, res, next) => {
  * UPDATE TRIP
  */
 const updateTrip = async (req, res, next) => {
-  const { title, startDate, endDate, summary } = req.body;
+  const { title, startDate, endDate, summary } = req.body || {} ;
   const tripId = req.params.id
   try {
     const trip = await Trip.findOne({
