@@ -39,22 +39,30 @@ const createStories = async (req, res, next) => {
     let imageUrls = [];
     // console.log("🚀 ~ createStories ~ imageUrls:", imageUrls)
     
-    if (req.files && req.files.length > 0) {
-      try {
-        imageUrls = await Promise.all(
-          req.files.map(async (file) => {
-            const url = await fileUpload(file.path);
-            if(!url) throw new Error("Upload failed");
-            return url;
-          })
-        )
-      } catch (error) {
-        return res.status(500).json({
-          message:"Image upload failed. Story not created.",
-        });
+if (req.files && req.files.length > 0) {
+  try {
+    for (const file of req.files) {
+      const result = await fileUpload(file.path);
+
+      if (!result) {
+        throw new Error("Upload failed");
       }
-    
+
+      imageUrls.push(result); // track successful uploads
     }
+  } catch (error) {
+    // ✅ cleanup already uploaded images
+    await Promise.allSettled(
+      imageUrls.map((img) =>
+        deleteFromCloudinary(img.public_id)
+      )
+    );
+
+    return res.status(500).json({
+      message: "Image upload failed. Story not created.",
+    });
+  }
+}
 
     const newStory = await Story.create({
       tripId,
@@ -172,6 +180,7 @@ const userId = req.user?.id;
  * DELETE STORY
  */
 const deleteStories = async (req, res, next) => {
+
   try {
     const story = await Story.findOne({
       where: { id: req.params.id },
@@ -187,14 +196,18 @@ const deleteStories = async (req, res, next) => {
     if (!story) {
       return res.status(404).json({ message: "Story not found" });
     }
-     if(story.images && story.images.length > 0)
-     {
-      await Promise.all(
-        story.images.map((img) => deleteFromCloudinary(img.public_id))
-      );
-     }
+     
+    if(story.images && story.images.length > 0) {
+      await Promise.allSettled(
+  story.images.map((img) =>
+    deleteFromCloudinary(img.public_id)
+  )
+);
+    }
 
-     //delete from DB
+    console.log("🚀 images:", story.images);
+     
+    //delete from DB
     await story.destroy();
 
     res.status(200).json({ message: "Deleted successfully" });
@@ -202,7 +215,6 @@ const deleteStories = async (req, res, next) => {
     next(error);
   }
 };
-
 module.exports.storyController = {
   createStories,
   getAllStories,

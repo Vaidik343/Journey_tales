@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       images: {
-        type: DataTypes.ARRAY(DataTypes.STRING), // PostgreSQL array
+        type: DataTypes.JSON, // PostgreSQL array
         allowNull: true,
       },
 
