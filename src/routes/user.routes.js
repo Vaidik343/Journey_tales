@@ -1,6 +1,7 @@
 const { userController } = require("../controllers/user.controller");
 const express = require("express");
 const validate = require("../middleware/validate");
+const {upload} = require("../middleware/multer");
 const { usersValidation } = require("../validations/users.validations");
 const { apiLimiter, authLimiter } = require("../middleware/rateLimiter");
 const { useAuth } = require("../middleware/auth");
@@ -14,8 +15,9 @@ router.post("/user/refresh", userController.refreshToken)
 router.post(
   "/me",
   apiLimiter,
-  usersValidation.createUserValidation,
-  validate,
+  // usersValidation.createUserValidation,
+  // validate,
+  upload.single("profile"),
   userController.createUser,
 );
 
@@ -27,6 +29,7 @@ router.put(
   useAuth,
   usersValidation.updateUserValidation,
   validate,
+  upload.single("profile"),
   userController.updateUser,
 ); 
 router.delete(

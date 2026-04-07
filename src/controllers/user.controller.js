@@ -5,6 +5,9 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/tokens");
+const { fileUpload } = require("../utils/fileUpload");
+const fs = require('fs');
+const path = require("path");
 
 /**
  * CREATE USER
@@ -12,6 +15,7 @@ const {
 const createUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+    console.log("user body", req.body)
 
     // check if email exists
     const exists = await User.findOne({ where: { email } });
@@ -19,13 +23,20 @@ const createUser = async (req, res, next) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
+    let profilePath = null;
+    if(req.file)
+    {
+      profilePath = await fileUpload(req.file.path);
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      profile: profilePath
     });
+    console.log("🚀 ~ createUser ~ user:", user)
 
     res.status(201).json(user);
   } catch (error) {
@@ -85,10 +96,29 @@ const updateUser = async (req, res, next) => {
       hashedPassword = await bcrypt.hash(password, 10);
     }
 
+    let profilePath = user.profile;
+
+    //handle new profile upload
+    if(req.file)
+    {
+      // optional: delete old profile image
+
+      if(user.profile)
+      {
+        const oldPath = path.join(__dirname, "..", user.profile);
+        if(fs.existsSync(oldPath))
+        {
+          fs.unlinkSync(oldPath);
+        }
+      }
+
+      profilePath = await fileUpload(req.file.path);
+    }
     await user.update({
-      name,
-      email,
+      name: name || user.name,
+      email: email || user.email,
       password: hashedPassword,
+      profile: profilePath,
     });
 
     res.status(200).json({ message: "Updated successfully", user });
