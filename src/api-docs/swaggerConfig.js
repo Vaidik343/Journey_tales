@@ -1,5 +1,3 @@
-const swaggerJsdoc = require('swagger-jsdoc');
-
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -8,12 +6,18 @@ const options = {
       version: '1.0.0',
       description: 'API documentation for Journey Tales backend',
     },
+
     servers: [
+      {
+        url: 'https://journey-tales.onrender.com',
+        description: 'Production server',
+      },
       {
         url: 'http://localhost:7011',
         description: 'Development server',
       },
     ],
+
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -24,8 +28,9 @@ const options = {
       },
     },
   },
-  apis: ['./src/api-docs/*.js'], // Path to the Swagger spec files
+
+  // KEEP YOUR OLD PATH
+  apis: ['./src/api-docs/*.js'],
 };
 
 module.exports = options;
-

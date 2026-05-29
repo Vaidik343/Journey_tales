@@ -99,11 +99,11 @@ const getAllStories = async (req, res, next) => {
       order: [["createdAt", "DESC"]],
     });
 
-    if (!stories.length) {
-      return res.status(404).json({ message: "Not found!" });
-    }
+    // if (!stories.length) {
+    //   return res.status(404).json({ message: "Not found!" });
+    // }
 
-    res.status(200).json(stories);
+    res.status(200).json(stories || []);
   } catch (error) {
     next(error);
   }
